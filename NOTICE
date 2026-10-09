@@ -1,0 +1,86 @@
+Sibuna
+Copyright (c) 2026 Vikrant Rathore and Ronak Rathore and Sibuna contributors.
+
+First-party engine: LGPL-3.0. First-party console: AGPL-3.0.
+See LICENSE and LICENSES/ for the scope and complete license texts.
+
+Documentation website template and styles adapted from SQLodin: MIT;
+LICENSES/SQLodin-MIT.txt. Source: github.com/insanai/sqlodin.
+
+Bundled dependencies in the default, single-node release:
+
+- Zaxonlite 0.7.0 and Paxos 0.7.0: MIT; LICENSES/Zaxonlite-MIT.txt and
+  LICENSES/Paxos-MIT.txt. Sources: github.com/insanai/zaxonlite and
+  github.com/insanai/paxos-zig. Zig 0.17 compatibility sources are included in vendor/.
+  Paxos chosen-history replay preserves ballot-bearing leader evidence and election timers.
+  Delayed Nacks cannot replace a newer durable or observed full ballot with an older hint.
+  Zaxonlite payloads use named same-directory stages and atomic no-replace installation.
+  File, directory and journal durability barriers retain their order. Abandoned stages
+  are removed under the node's exclusive data-directory lock during startup.
+  Original archives, package hashes, source digests and local corrections are recorded
+  in vendor/provenance.json.
+  SQLite dependencies remain pinned in vendor/zaxonlite/build.zig.zon.
+- SQLite 3.50.4: public domain; sqlite.org/copyright.html. The pinned
+  amalgamation is sqlite-amalgamation-3500400.zip.
+- sqlite-vec 0.1.9: MIT; LICENSES/sqlite-vec-MIT.txt.
+  Source: github.com/asg017/sqlite-vec.
+- daisyUI and Tailwind CSS: MIT; LICENSES/daisyUI-MIT.txt and
+  LICENSES/Tailwind-MIT.txt. Versions are pinned in
+  apps/console-ui/web/package-lock.json. Only generated CSS is bundled;
+  Node and npm are not runtime dependencies.
+- Natural Earth 5.1.2 geographic geometry: public domain;
+  naturalearthdata.com/about/terms-of-use/. Reproduction and source digests
+  are in tools/console_geometry.py and the console asset manifest.
+- Zig 0.17.0 runtime and standard library: MIT and included notices;
+  LICENSES/Zig-LICENSE.txt. Static Linux releases also link musl libc;
+  LICENSES/musl-COPYRIGHT.txt. Windows releases link the mingw-w64 runtime
+  shipped with Zig: ZPL-2.1, with public-domain parts and David M. Gay's
+  gdtoa conversion code; LICENSES/mingw-w64-ZPL-2.1.txt and
+  LICENSES/mingw-w64-gdtoa.txt. The C library itself is the system UCRT.
+
+No GeoIP address database is bundled. Operators import separately licensed
+datasets using Sibuna's GeoIP commands. Cluster builds are separate source
+builds and link OpenSSL 3; the default release has no OpenSSL dependency.
+
+CRS engine dependencies and compatibility fixtures:
+
+- OWASP Core Rule Set 4.30.0: Apache-2.0; LICENSES/OWASP-CRS-Apache-2.0.txt
+  and vendor/crs/LICENSE. Source: github.com/coreruleset/coreruleset.
+  Release digest, signing fingerprint and unmodified file digests are in
+  vendor/crs/provenance.json. Release packages download and verify the signed
+  rules when the operator prepares a candidate; rules are not bundled in the
+  executable. Inspection starts when the operator selects Audit or Enforce.
+  vendor/crs/fixture.zig is a first-party LGPL-3.0 test facade.
+- ModSecurity 3.0.14 compatibility algorithms adapted in
+  libs/crs/src/transform_scan.zig, transform_escape.zig, transform_entity.zig
+  transform_base64.zig, transform_path.zig and transform_unicode.zig: Apache-2.0;
+  LICENSES/ModSecurity-Apache-2.0.txt. Copyright (c) 2015-2023 Trustwave
+  Holdings, Inc. Source: github.com/owasp-modsecurity/ModSecurity.
+  The native scans use caller-owned buffers and explicit bounds instead of
+  the reference's in-place C++ strings. This does not bundle the ModSecurity
+  engine or imply complete compatibility. External SecLang test vectors are
+  fetched into an ignored cache, not redistributed with Sibuna.
+- Mbed TLS commit 2ca6c285a0dd3f33982dd57299012dacab1ff206 base64
+  validation semantics adapted in transform_base64.zig:
+  Apache-2.0; LICENSES/Mbed-TLS-Apache-2.0.txt. Copyright The Mbed TLS
+  Contributors. Source: github.com/Mbed-TLS/mbedtls. The native bounded
+  decoder does not link or bundle the Mbed TLS library.
+- libinjection dictionary, SQL detection and HTML/XSS algorithms,
+  commit b9fcaaf9e50e9492807b23ffcc6af46ee1f203b9:
+  BSD-3-Clause; LICENSES/libinjection-BSD-3-Clause.txt and vendor/libinjection/LICENSE.
+  Copyright (c) 2012-2016 Nick Galbreath. Source: github.com/libinjection/libinjection.
+  The generated native lookup asset and native sql_token_context.zig, sql_tokens*.zig,
+  sql_fold*.zig, sql_detector*.zig, html_*.zig and xss_*.zig routines and
+  vendor/libinjection/xss_tables.zig
+  routines are reproduced or adapted from the pinned source and digests recorded in
+  vendor/libinjection/provenance.json. The port uses caller-owned buffers and budgets;
+  no libinjection C library is linked into Sibuna. These detectors are used by
+  the native CRS transaction engine described in SID 0010.
+
+Documentation front-page animation:
+
+- three.js 0.186.1: MIT; docs/site/three-LICENSE.txt. Copyright 2010-2026
+  three.js authors. Source: https://github.com/mrdoob/three.js. The pinned,
+  generated browser renderer and source hashes are in docs/site/admission-assets.json.
+  It is used by the documentation illustration, not the daemon or console.
+  The first-party scene and controller remain LGPL-3.0.
