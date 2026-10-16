@@ -1,63 +1,80 @@
+# Generated from distribution/homebrew/sibuna.rb.in by distribution/scripts/homebrew_formula.py.
+# It installs the release archives, the same executables the release workflow verified.
 class Sibuna < Formula
-  desc "Admission proxy with proof-of-work challenges and WAF inspection"
-  homepage "https://github.com/insanai/sibuna"
-  url "https://github.com/insanai/sibuna/releases/download/v0.3.5/sibuna-0.3.5-source.tar.gz"
-  sha256 "3b55834a4d853bae728c56a457a75dfd6a0640078f730642335412f15e1d8eb8"
-  license all_of: ["LGPL-3.0-only", "AGPL-3.0-only"]
+  desc "Web firewall and anti-crawler proxy with proof-of-work admission"
+  homepage "https://insanai.github.io/sibuna/"
+  version "1.0.0-beta.1"
+  license "LGPL-3.0-or-later"
 
-  depends_on "python@3.14" => :build
-  depends_on "zig" => :build
+  on_macos do
+    on_arm do
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-macos-arm64.tar.gz"
+      sha256 "ce5116cf7f05ba2f8b3b52915d34d3b64bc48a3ecd84ed7cd66d6352f54ae524"
+    end
+    on_intel do
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-macos-amd64.tar.gz"
+      sha256 "e3b1cf471ab846801d952add18620c5878f9d6f1180facdb1aab935dee0f3d7a"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-linux-arm64.tar.gz"
+      sha256 "cf93822964c7b86c16b6dc909c6ea6e3431cdd6023cef6a3dca2eb58a1baa9d1"
+    end
+    on_intel do
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-linux-amd64.tar.gz"
+      sha256 "1c26128c01b0f96914e68374ad6f7e8f96f282f9c9a39cfc55d75fb67b666416"
+    end
+  end
 
   def install
-    odie "This release requires Zig 0.17.0" unless Utils.safe_popen_read("zig", "version").strip == "0.17.0"
-    system "python3.14", "tools/console_assets.py", "check"
-    system "zig", "build", "-Doptimize=safe", "-Dstrip=true", "-Dstorage=true",
-           "-Dconsole=true", "-Dcluster=false", "-Dcpu=baseline", "-j2"
-    bin.install "zig-out/bin/sibuna"
-    doc.install "NOTICE", "SECURITY.md", "SOURCE.txt"
-    doc.install "LICENSES"
+    bin.install "sibuna"
+    doc.install "README.md", "SECURITY.md", "NOTICE", "sibuna.build.json", "LICENSES"
   end
 
   def caveats
     <<~EOS
-      No service is started automatically. Before running Sibuna, create a private
-      32-byte admission seed and pass --secret-file and a persistent --data-dir.
-      Configure an IP literal origin with --upstream-host and --upstream-port.
-      The console is opt-in; see the upstream operations documentation.
+      No service is started. Before running Sibuna, create a private admission seed of
+      64 hexadecimal digits and pass it with --secret-file, with a persistent --data-dir:
+        umask 077; od -An -tx1 -N32 /dev/urandom | tr -d ' \\n' > admission.seed
+      Point --upstream-host (an IP literal) and --upstream-port at the origin.
+      The console is opt-in; see https://insanai.github.io/sibuna/ for operations.
     EOS
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/sibuna --version 2>&1")
+    assert_equal "sibuna #{version}", shell_output("#{bin}/sibuna --version 2>&1").strip
     require "net/http"
     require "timeout"
     seed = testpath/"admission.seed"
-    seed.binwrite Random.bytes(32)
+    seed.write Random.bytes(32).unpack1("H*")
     seed.chmod 0600
-    original_seed = seed.binread
+    original_seed = seed.read
     port = free_port
     2.times do
       pid = Process.spawn((bin/"sibuna").to_s, "--host", "127.0.0.1", "--port", port.to_s,
                           "--secret-file", seed.to_s, "--data-dir", (testpath/"state").to_s,
                           out: (testpath/"daemon.log").to_s, err: (testpath/"daemon.log").to_s)
       begin
-        Timeout.timeout(15) do
+        Timeout.timeout(30) do
           loop do
             begin
               response = Net::HTTP.get_response(URI("http://127.0.0.1:#{port}/__sibuna/health"))
               break if response.code == "200"
             rescue Errno::ECONNREFUSED, EOFError
-              # Wait for the first listener startup.
+              # The listener is still starting.
             end
             sleep 0.1
           end
         end
-        assert_equal original_seed, seed.binread
-        assert_path_exists testpath/"state"
+        assert_equal original_seed, seed.read
+        assert_path_exists testpath/"state/sibuna.db"
       ensure
-        Process.kill("TERM", pid) rescue Errno::ESRCH
-        Process.wait pid
+        Process.kill("TERM", pid)
+        _, status = Process.wait2(pid)
       end
+      assert_equal 0, status.exitstatus
     end
   end
 end
