@@ -1,18 +1,16 @@
 # Sibuna Homebrew tap
 
-The upstream tap for [Sibuna](https://github.com/insanai/sibuna), an admission
-proxy with proof-of-work challenges and WAF inspection. This repository publishes
-a CLI **formula**, built from source. Packaging source and qualification live in
-the [Sibuna monorepo](https://github.com/insanai/sibuna/tree/main/distribution/homebrew).
+The upstream tap for [Sibuna](https://github.com/insanai/sibuna), web protection with
+browser proof of work and an optional console. This repository publishes a CLI
+**formula** for macOS and Linux, on Apple Silicon, ARM64 and x86-64. Packaging source and
+the release checks live in the
+[Sibuna repository](https://github.com/insanai/sibuna/tree/main/distribution/homebrew).
 
-The formula is imported only after an upstream release passes its native
-Homebrew source-build and restart tests. Check that `Formula/sibuna.rb` is present
-before installation. Each formula uses the corresponding published source bundle
-and its verified checksum.
+The formula installs the release archives: the same executables that Sibuna's release
+workflow built and started on each platform before publication. Homebrew downloads the
+archive for your system and checks it against the SHA-256 in the formula.
 
 ## Installation
-
-Once the formula is published:
 
 ```sh
 brew tap insanai/sibuna
@@ -20,17 +18,21 @@ brew install insanai/sibuna/sibuna
 sibuna --version
 ```
 
-The source build requires the release's exact Zig version and Python 3.14. If
-Homebrew's Zig has moved to a different version, follow the upstream installation
-guide rather than changing the compiler check. No service starts automatically.
-The upstream Homebrew gate builds and tests this formula on macOS 15. This tap
-currently provides source builds; it does not publish prebuilt Homebrew bottles.
+The current formula follows the newest published release, which is a beta at present.
+No service starts automatically.
 
-Before running Sibuna, create a private 32-byte admission seed and configure a
-persistent private data directory, an IP-literal origin and an appropriate
-process manager. The console is opt-in. See the
-[operator guide](https://insanai.github.io/sibuna/book/operations.html) for
-configuration, origin protection, upgrades and backup requirements.
+Before running Sibuna, create a private admission seed of 64 hexadecimal digits and a
+persistent private data directory, and point Sibuna at an IP-literal origin:
+
+```sh
+(umask 077; od -An -tx1 -N32 /dev/urandom | tr -d ' \n' > admission.seed)
+sibuna --host 127.0.0.1 --port 8080 --upstream-port 3000 \
+  --secret-file ./admission.seed --data-dir ./data
+```
+
+The console is opt-in. See the
+[operations guide](https://insanai.github.io/sibuna/book/operations.html) for
+configuration, origin protection, upgrades and backups.
 
 Stop your running Sibuna process before upgrading:
 
@@ -45,34 +47,26 @@ To remove the executable after stopping it:
 brew uninstall insanai/sibuna/sibuna
 ```
 
-Operator-owned seeds, configuration and state live outside Homebrew's installation
-and must be retained during upgrade/removal. Back up state before an upgrade;
-binary rollback does not undo a database migration.
+Seeds, configuration and state live outside Homebrew's installation and are kept
+during upgrade and removal. Back up the data directory before an upgrade.
 
 ## Release updates
 
-The daily **Update Sibuna formula** workflow imports the formula attached to the
-latest stable application release. It verifies the formula and corresponding
-source bundle against release checksums and GitHub asset digests before committing
-the recipe. Maintainers can also run the workflow with a published release tag.
-It uses this tap's scoped `GITHUB_TOKEN`; no cross-repository publishing secret
-is required. The source-build and runtime gates run upstream before publication.
+The daily **Update Sibuna formula** workflow imports the formula attached to the newest
+published release. Before it commits the formula, it checks the formula's own checksum,
+and every archive URL and SHA-256 in it, against the release's `SHA256SUMS` and GitHub's
+asset digests. Maintainers can also run the workflow for a given release tag. It uses
+this tap's own `GITHUB_TOKEN`; no cross-repository secret is needed.
 
-This tap is maintained by Sibuna. Homebrew core inclusion requires a separate
-community audit and human review. AI-assisted packaging work must be disclosed
-in any community submission.
+Homebrew core inclusion requires a separate community audit and human review.
 
 ## License and security
 
-This tap's first-party recipes, tooling and documentation follow Sibuna's
-**LGPL-3.0-only** licensing. The default installed binary includes the console
-and is a combined work under **AGPL-3.0-only**; the engine remains LGPL-3.0-only.
-See [LICENSE](LICENSE), [LICENSES](LICENSES) and [NOTICE](NOTICE) for the upstream
-scope and third-party terms. Immutable corresponding source is attached to each
-qualified release and recorded in the formula.
+Sibuna is free software under **LGPL-3.0-or-later**, and so are this tap's recipes,
+tooling and documentation. See [LICENSE](LICENSE), [LICENSES](LICENSES) and
+[NOTICE](NOTICE) for the complete terms and third-party notices.
 
 Please report security issues privately through
 [Sibuna's security reporting page](https://github.com/insanai/sibuna/security/advisories/new).
 See [SECURITY.md](SECURITY.md) for the policy. Public issues are for non-sensitive
-packaging defects; do not include credentials, private seeds or vulnerability
-details.
+packaging defects; do not include credentials, private seeds or vulnerability details.
