@@ -3,28 +3,28 @@
 class Sibuna < Formula
   desc "Web firewall and anti-crawler proxy with proof-of-work admission"
   homepage "https://insanai.github.io/sibuna/"
-  version "1.0.0-beta.1"
+  version "1.0.0-beta.2"
   license "LGPL-3.0-or-later"
 
   on_macos do
     on_arm do
-      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-macos-arm64.tar.gz"
-      sha256 "ce5116cf7f05ba2f8b3b52915d34d3b64bc48a3ecd84ed7cd66d6352f54ae524"
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.2/sibuna-macos-arm64.tar.gz"
+      sha256 "e08ddb15cb3a38687decf110e3e873d16409a02a2e8aa7f2f89a0abe401221dd"
     end
     on_intel do
-      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-macos-amd64.tar.gz"
-      sha256 "e3b1cf471ab846801d952add18620c5878f9d6f1180facdb1aab935dee0f3d7a"
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.2/sibuna-macos-amd64.tar.gz"
+      sha256 "ed07da5cffd5593a80d068809530e3e23b7cded01383a7b80bb3fc05e8db72db"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-linux-arm64.tar.gz"
-      sha256 "cf93822964c7b86c16b6dc909c6ea6e3431cdd6023cef6a3dca2eb58a1baa9d1"
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.2/sibuna-linux-arm64.tar.gz"
+      sha256 "8569788085b1551bcd11fe58f5194eb30818bb5cd60d521c4d08f82fb309cf78"
     end
     on_intel do
-      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.1/sibuna-linux-amd64.tar.gz"
-      sha256 "1c26128c01b0f96914e68374ad6f7e8f96f282f9c9a39cfc55d75fb67b666416"
+      url "https://github.com/insanai/sibuna/releases/download/v1.0.0-beta.2/sibuna-linux-amd64.tar.gz"
+      sha256 "2b144a91a83eaf61d6d3f8e63701d31800ed6072dbc515f76e865234bb1857f7"
     end
   end
 
