@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Published upstream stable tag (empty selects latest)
+        description: Published upstream tag (empty selects the newest release)
         required: false
         type: string
 permissions:
@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Import qualified upstream formula
+      - name: Import the verified upstream formula
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}
