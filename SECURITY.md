@@ -1,84 +1,48 @@
 # Security policy
 
-Sibuna welcomes confidential vulnerability reports about its daemon, browser
-proof-of-work code, management console, storage, and official build/packaging tools.
-The designated project maintainers handle security reports through GitHub's private
-channel. Personal names, email addresses, phone numbers, and private contact details
-are not published as security contacts.
+We welcome confidential reports of vulnerabilities in Sibuna: the daemon, the browser proof-of-work code, the console, storage, and the official build and packaging recipes. The maintainers handle security reports through GitHub's private channel. We publish no personal names, email addresses or telephone numbers as security contacts.
 
 ## Supported versions
 
 | Version | Security fixes |
 | --- | --- |
-| Latest stable release | Supported |
-| Earlier releases | Upgrade; backports only if explicitly announced |
-| Unreleased branches and local package candidates | Reports welcome; no release-support commitment |
+| Latest release (including the 1.0.0 pre-releases until 1.0.0) | Supported |
+| Earlier releases | Upgrade; backports only when announced |
+| Unreleased branches and local builds | Reports welcome; no support commitment |
 
-The latest stable release is on the [releases page](https://github.com/insanai/sibuna/releases).
-Distribution maintainers may support their own backports. Package-manager rollback
-does not reverse database migrations; follow the release's compatibility guidance.
+The releases are listed on the [releases page](https://github.com/insanai/sibuna/releases). Distribution maintainers may support backports of their own. A package-manager rollback does not reverse a database migration; follow the release notes.
 
 ## Report privately
 
-Use [GitHub private vulnerability reporting](https://github.com/insanai/sibuna/security/advisories/new)
-with a GitHub account. Reports are shared with authorized repository maintainers,
-not posted as public issues. GitHub may display participating account identities to
-private-report participants. This policy does not promise anonymity from GitHub or
-hide identity information already present in a participant's profile.
+Use [GitHub private vulnerability reporting](https://github.com/insanai/sibuna/security/advisories/new) with a GitHub account. The report reaches the repository's maintainers and is not a public issue. GitHub may show the accounts that take part in a private report to each other; this policy cannot hide identity information that a GitHub profile already shows.
 
-Do not put unpatched vulnerability details in a public issue, discussion, pull
-request, SID, or package-review thread. If the private form is unavailable, open an
-issue containing only a request for a private security contact, without exploit
-details, sensitive logs, or deployment identity. Wait for a verified private channel
-before sending the report. No separate security email address is advertised.
+Do not put details of an unfixed vulnerability in a public issue, discussion, pull request, design record or package review. If the private form is unavailable, open an issue that only asks for a private security contact, without technical details, logs or deployment names, and wait for a private channel before sending the report. There is no separate security email address.
 
-Include what you can; a full exploit or severity score is not required:
+Include what you can; a working exploit or a severity score is not required:
 
-- Affected release/commit, package channel, OS/architecture, and relevant build flags.
-- Summary, impact, and required access or configuration.
-- Minimal reproduction against an isolated test deployment, or supporting evidence.
-- Sanitized configuration, request/response samples, and relevant logs.
-- Suggested mitigation, related identifiers, and whether exploitation or public disclosure is known.
-- Preferred disclosure timeline and optional contact/credit preference; a legal name is not required.
+- The affected release or commit, package channel, operating system, architecture and build features.
+- A summary of the impact and of the access or configuration it needs.
+- A minimal reproduction against an isolated test deployment, or other evidence.
+- Sanitized configuration, request and response samples, and relevant logs.
+- A suggested mitigation, related identifiers, and whether exploitation or disclosure is already known.
+- Your preferred disclosure timeline and, optionally, how you wish to be credited; a legal name is not required.
 
-Remove live seeds, console/cluster keys, passwords, cookies, recovery codes, private
-certificates, personal data, and unrelated customer traffic. Use synthetic test data.
-Mention compromised release credentials privately. Test only systems you own or have
-permission to test, without disrupting services or accessing other people's data.
+Remove live admission seeds, console and peer keys, database URLs, passwords, cookies, recovery codes, private certificates, personal data and unrelated traffic; use synthetic data. Tell us privately if release credentials may be compromised. Test only systems you own or may test, without disrupting service or reading other people's data.
 
 ## Response and disclosure
 
-We aim to acknowledge reports within **3 business days**, provide an initial
-assessment within **7 business days**, and send an update at least weekly while a
-confirmed issue is actively being investigated. These are small-team targets, not
-an SLA or a guaranteed resolution time. If acknowledgement is missing, follow up
-privately; the contact-request fallback above must contain no technical details.
+We aim to acknowledge a report within **3 business days**, to give a first assessment within **7 business days**, and to send an update at least weekly while we investigate a confirmed issue. These are the targets of a small team, not a service-level agreement. If you hear nothing, follow up privately; a contact request in a public issue must still hold no technical details.
 
-We assess reproducibility, impact, exposure, affected versions, and mitigations.
-Lack of a complete proof of concept does not by itself invalidate a report. Confirmed
-issues receive a fix or documented mitigation, regression checks, and upgrade
-guidance. Actively exploited and high-impact issues receive priority.
+We assess reproducibility, impact, exposure, affected versions and mitigations. A report without a complete proof of concept is still a report. A confirmed issue receives a fix or a documented mitigation, a regression test, and upgrade guidance; actively exploited and high-impact issues come first.
 
-We coordinate disclosure with the reporter and affected downstream maintainers,
-normally aiming for a fix and advisory within **90 days of receipt**. Agree on
-extensions when necessary; active exploitation or an already-public issue may need
-earlier guidance. This is a coordination target, not a blanket embargo requirement.
-Advisories state affected/fixed versions, impact, mitigations, and upgrade limitations.
-We request a CVE when appropriate and offer optional credit only with consent.
-Public advisories use project roles and omit private maintainer contacts, reporter
-identities without consent, and identifying deployment data.
+We coordinate disclosure with the reporter and affected downstream maintainers, normally aiming for a fix and an advisory within **90 days of receipt**. We agree on extensions when necessary; active exploitation or an already public issue may need earlier guidance. Advisories state the affected and fixed versions, the impact, mitigations and upgrade limits. We request a CVE when appropriate and credit reporters only with their consent. Advisories name project roles, not private contacts, and omit reporter identities without consent and identifying deployment data.
 
-We do not promise a bounty, payment, or legal safe harbor. Ordinary bugs/support can
-use public issues after confirming they contain no sensitive material.
+We offer no bounty, payment or legal safe harbor. Ordinary bugs and support questions belong in public issues once they hold no sensitive material.
 
 ## Deployment responsibilities
 
-Use a non-root service identity, independent private persistent admission/console
-keys, suitable TLS ingress, and tested backups. Console startup is explicit.
-`/__sibuna/metrics` and `/__sibuna/health` bypass declarative policy: restrict their
-exposure at the ingress/network boundary. Health indicates listener status, not full
-origin/storage readiness. Proof of work does not prevent every denial-of-service
-attack or establish human identity.
+Run Sibuna under an unprivileged account with a private, persistent admission seed (`--secret-file`), independent console and peer keys, TLS at the ingress, and tested backups. The console is off until `--console` is given. `/__sibuna/metrics` and `/__sibuna/health` bypass the declarative policy, so restrict them at the ingress or network boundary. The health route reports that the listener answers, not that the origin or the storage is ready. Proof of work does not stop every denial-of-service attack and does not establish that a client is human.
 
-SID 0001 and SID 0011 under `docs/sid/records/` define maintainer handling and launch
-gates. Verify private-report access and notifications before a new package launch.
+On Unix, Sibuna refuses key, credential and database URL files that the group or others may read. Windows has no such mode bits and Sibuna does not inspect ACLs there: restricting those files to the account that runs Sibuna is the operator's job.
+
+The release assets are not signed. Verify each download against `SHA256SUMS` from the release page before installing it.
